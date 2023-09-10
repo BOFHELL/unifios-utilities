@@ -120,8 +120,11 @@ echo "In container start network"
 systemd-nspawn -M "$container_name" -D /data/custom/machines/"$container_name" /bin/bash -c systemctl enable systemd-networkd || true
 
 echo "in container set default DNS 1.1.1.1"
-systemd-nspawn -M "$container_name" -D /data/custom/machines/"$container_name" /bin/bash -c echo "nameserver 1.1.1.1" > /etc/resolv.conf \
-echo ""$container_name"" > /etc/hostname 
+systemd-nspawn -M "$container_name" --pipe -D /data/custom/machines/"$container_name" /bin/bash << EOF
+echo "nameserver 1.1.1.1" > /etc/resolv.conf
+echo "$container_name" > /etc/hostname
+EOF
+
 
 #### we will link the container to /var/lib/machines so we can control it with machinectl
 echo "Linking the container to /var/lib/machines"
